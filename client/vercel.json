@@ -1,5 +1,17 @@
 {
-    "rewrites": [
-        {"source":"/(.*)","destination":"/"}
-    ]
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/client/$1"
+    }
+  ]
 }
