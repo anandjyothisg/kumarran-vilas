@@ -23,8 +23,8 @@ const HomePage = () => {
       <Navbar scrollY={scrollY} />
       <Hero />
       <Legacy />
-      <Story />
       <ProductGallery />
+      <Story />
       <Footer />
     </div>
   );
