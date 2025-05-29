@@ -1,11 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import React from 'react';
 
 const ProductGallery = () => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const productRefs = useRef([]);
   
   // Product data with updated categories and multiple images for products
   const allProducts = [
@@ -227,42 +226,7 @@ const ProductGallery = () => {
     } else {
       setProducts(allProducts.filter(product => product.category === activeCategory));
     }
-    
-    // Reset and initialize product refs
-    productRefs.current = Array(allProducts.length).fill(null);
   }, [activeCategory]);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('opacity-100', 'translate-y-0');
-            entry.target.classList.remove('opacity-0', 'translate-y-4');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-    );
-
-    productRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      productRefs.current.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
-    };
-  }, [products]);
-
-  // Add refs to the array
-  const addToRefs = (el, index) => {
-    if (el && !productRefs.current[index]) {
-      productRefs.current[index] = el;
-    }
-  };
   
   // Handle quantity changes
   const decrementQuantity = (productId) => {
@@ -315,20 +279,17 @@ const ProductGallery = () => {
           ))}
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {/* Products Grid - 2 columns on mobile, more on larger screens */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product, index) => (
-            <div className="mx-auto w-full sm:w-auto" style={{ maxWidth: '85%' }}>
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                ref={(el) => addToRefs(el, index)}
-                index={index}
-                quantity={quantities[product.id]}
-                onDecrement={() => decrementQuantity(product.id)}
-                onIncrement={() => incrementQuantity(product.id)}
-              />
-            </div>
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              index={index}
+              quantity={quantities[product.id]}
+              onDecrement={() => decrementQuantity(product.id)}
+              onIncrement={() => incrementQuantity(product.id)}
+            />
           ))}
         </div>
       </div>
@@ -359,7 +320,7 @@ const ImageSlideshow = ({ images }) => {
   };
   
   return (
-    <div className="relative w-full h-80 sm:h-64"> {/* Taller on mobile, regular on larger screens */}
+    <div className="relative w-full h-48 sm:h-64 md:h-48 lg:h-64">
       {validImages.map((image, index) => (
         <div
           key={index}
@@ -383,7 +344,7 @@ const ImageSlideshow = ({ images }) => {
             className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-1 shadow-md text-amber-900 hover:bg-opacity-90 transition-all z-10"
             aria-label="Previous image"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -393,7 +354,7 @@ const ImageSlideshow = ({ images }) => {
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-1 shadow-md text-amber-900 hover:bg-opacity-90 transition-all z-10"
             aria-label="Next image"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -403,8 +364,8 @@ const ImageSlideshow = ({ images }) => {
             {validImages.map((_, index) => (
               <span
                 key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? 'w-4 bg-amber-500' : 'w-1.5 bg-gray-300'
+                className={`h-1 sm:h-1.5 rounded-full transition-all duration-300 ${
+                  index === currentIndex ? 'w-3 sm:w-4 bg-amber-500' : 'w-1 sm:w-1.5 bg-gray-300'
                 }`}
               ></span>
             ))}
@@ -416,7 +377,7 @@ const ImageSlideshow = ({ images }) => {
 };
 
 // Enhanced Product Card Component with Image Slideshow
-const ProductCard = React.forwardRef(({ product, index, quantity, onDecrement, onIncrement }, ref) => {
+const ProductCard = ({ product, index, quantity, onDecrement, onIncrement }) => {
   // Ensure we have a valid images array, fallback to single image if not
   const productImages = product.images && product.images.length > 0 
     ? product.images 
@@ -424,12 +385,7 @@ const ProductCard = React.forwardRef(({ product, index, quantity, onDecrement, o
   
   return (
     <div
-      ref={ref}
-      className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-500 opacity-0 translate-y-4 hover:shadow-lg flex flex-col"
-      style={{ 
-        transitionDelay: `${index * 80}ms`,
-        height: '420px' // Fixed height for all cards
-      }}
+      className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg flex flex-col h-96 sm:h-[420px] md:h-96 lg:h-[420px]"
     >
       {/* Product image slideshow */}
       <div className="relative overflow-hidden">
@@ -442,23 +398,23 @@ const ProductCard = React.forwardRef(({ product, index, quantity, onDecrement, o
       </div>
       
       {/* Product details */}
-      <div className="p-4 flex flex-col flex-grow">
-        <div className="text-sm text-gray-500 mb-1">{product.subcategory}</div>
-        <h3 className="text-amber-900 font-medium text-sm mb-2 line-clamp-2 h-10">{product.name}</h3>
+      <div className="p-3 sm:p-4 flex flex-col flex-grow">
+        <div className="text-xs sm:text-sm text-gray-500 mb-1">{product.subcategory}</div>
+        <h3 className="text-amber-900 font-medium text-xs sm:text-sm mb-2 line-clamp-3 sm:line-clamp-2 flex-grow">{product.name}</h3>
         
         {/* Quantity selector */}
         <div className="flex items-center justify-between mt-auto">
-          <div className="flex items-center border border-gray-300 rounded">
+          <div className="flex items-center border border-gray-300 rounded text-sm">
             <button 
               onClick={onDecrement}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
+              className="px-2 py-1 text-gray-600 hover:bg-gray-100 text-xs sm:text-sm"
             >
               -
             </button>
-            <span className="px-3 py-1 border-l border-r border-gray-300">{quantity}</span>
+            <span className="px-2 sm:px-3 py-1 border-l border-r border-gray-300 text-xs sm:text-sm">{quantity}</span>
             <button 
               onClick={onIncrement}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100"
+              className="px-2 py-1 text-gray-600 hover:bg-gray-100 text-xs sm:text-sm"
             >
               +
             </button>
@@ -466,12 +422,12 @@ const ProductCard = React.forwardRef(({ product, index, quantity, onDecrement, o
         </div>
         
         {/* View Price and Details Button */}
-        <button className="w-full mt-3 bg-amber-500 hover:bg-amber-600 py-2 rounded text-white font-medium transition-colors">
+        <button className="w-4/5 mx-auto mt-3 bg-amber-500 hover:bg-amber-600 py-2 rounded-lg text-white font-medium transition-colors text-xs sm:text-sm">
           View Price and Details
         </button>
       </div>
     </div>
   );
-});
+};
 
 export default ProductGallery;

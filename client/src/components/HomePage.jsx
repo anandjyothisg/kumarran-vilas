@@ -5,6 +5,7 @@ import Legacy from './Legacy';
 import Story from './Story';
 import ProductGallery from './ProductGallery';
 import Footer from './Footer';
+import ProductStage from './ProductStage';
 
 const HomePage = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -19,12 +20,13 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-amber-50 to-amber-100">
       <Navbar scrollY={scrollY} />
       <Hero />
       <Legacy />
-      <Story />
+      <ProductStage />
       <ProductGallery />
+      <Story />
       <Footer />
     </div>
   );
