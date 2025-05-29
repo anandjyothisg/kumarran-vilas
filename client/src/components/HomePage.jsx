@@ -24,10 +24,7 @@ const HomePage = () => {
       <Navbar scrollY={scrollY} />
       <Hero />
       <Legacy />
-<<<<<<< HEAD
       <ProductStage />
-=======
->>>>>>> cce9c9fddc7a2138e610e633faae7efc5446a5df
       <ProductGallery />
       <Story />
       <Footer />
