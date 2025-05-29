@@ -6,8 +6,8 @@ const ProductStage = () => {
     { id: 1, name: 'Product 1', image: 'images/specialvibuthi/03.png' },
     { id: 2, name: 'Product 2', image: 'images/handmadetrans.png' },
     { id: 3, name: 'Product 3', image: 'images/regularvibuthi/03.png' },
-    { id: 4, name: 'Product 4', image: '/path/to/your/product4.png' },
-    { id: 5, name: 'Product 5', image: '/path/to/your/product5.png' },
+    { id: 4, name: 'Product 4', image: 'images/plainvibuthi/04.png' },
+    { id: 5, name: 'Product 5', image: 'images/villaisandal/06.png' },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
