@@ -53,17 +53,26 @@ const AIAssistant = () => {
         body: JSON.stringify({ message: newMessage.text })
       });
 
+      if (!response.ok) {
+        console.error('Server responded with non-200:', response.status);
+        throw new Error(`Server error: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('API response:', data);
+
+      const aiReply = data?.reply?.trim();
 
       const aiResponse = {
         id: messages.length + 2,
-        text: data.reply || "Sorry, I didn't get a response from the server.",
+        text: aiReply || "Sorry, I didn't get a valid response from the server.",
         sender: 'ai',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
+      console.error('Error fetching AI response:', error);
       const errorResponse = {
         id: messages.length + 2,
         text: "Oops! Something went wrong. Please try again later.",
@@ -71,7 +80,6 @@ const AIAssistant = () => {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorResponse]);
-      console.error('Error fetching AI response:', error);
     } finally {
       setIsTyping(false);
     }
@@ -85,7 +93,10 @@ const AIAssistant = () => {
   };
 
   const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return new Date(timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -94,8 +105,8 @@ const AIAssistant = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 ${
-          isOpen 
-            ? 'bg-red-500 hover:bg-red-600' 
+          isOpen
+            ? 'bg-red-500 hover:bg-red-600'
             : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
         } text-white flex items-center justify-center`}
       >
@@ -116,7 +127,7 @@ const AIAssistant = () => {
             </div>
           </div>
 
-          {/* Messages Container */}
+          {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
             {messages.map((message) => (
               <div
@@ -149,7 +160,7 @@ const AIAssistant = () => {
                 )}
               </div>
             ))}
-            
+
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex gap-3 justify-start">
@@ -168,7 +179,7 @@ const AIAssistant = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
+          {/* Input */}
           <div className="p-4 bg-white border-t border-gray-200">
             <div className="flex gap-2">
               <input
