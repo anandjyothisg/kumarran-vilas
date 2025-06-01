@@ -11,10 +11,10 @@ app.use(express.json());
 
 // Groq API Key
 const groq = new Groq({
-  apiKey: "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", // 🔁 Replace with your Groq API key
+  apiKey: "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", // ⚠️ Keep this secret in production
 });
 
-// Fixed content that always goes to the assistant
+// Fixed context for assistant
 const shopIntro = `
 You are Selvi, the AI assistant for Palani Kumaran Vilas, a famous and trusted local shop in Palani that specializes in viboothi, religious powders, and spiritual items.
 
@@ -28,7 +28,7 @@ When asked about "Kumarran Vilas" or "Palani Kumaran Vilas," always respond cris
 Answer briefly and directly related to the shop and its services. Avoid generic answers or irrelevant information.
 `;
 
-// Root route
+// Root endpoint
 app.get("/", (req, res) => {
   res.send("✅ Selvi AI Assistant is up and running at Palani Kumaran Vilas!");
 });
@@ -56,12 +56,15 @@ app.post("/chat", async (req, res) => {
       stream: false
     });
 
-    const aiReply = chatCompletion.choices?.[0]?.message?.content || "⚠️ No response from Selvi.";
+    const aiReply = chatCompletion.choices?.[0]?.message?.content || "⚠️ Selvi did not respond.";
     console.log("🤖 Selvi's Reply:", aiReply);
-    res.json({ response: aiReply });
+
+    // ✅ Modified to match frontend expectation
+    res.json({ reply: aiReply });
+
   } catch (err) {
     console.error("❌ Groq Error:", err.message);
-    res.status(500).json({ error: "AI request failed." });
+    res.status(500).json({ reply: "⚠️ Selvi encountered an error. Please try again." });
   }
 });
 

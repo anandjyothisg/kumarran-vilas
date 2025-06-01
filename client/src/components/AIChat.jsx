@@ -6,7 +6,7 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hello! I'm your AI assistant. How can I help you today?",
+      text: "வணக்கம்! நான்தான் உங்கள் AI உதவியாளர் செல்வி. என்ன உதவ வேண்டும்?",
       sender: 'ai',
       timestamp: new Date()
     }
@@ -59,13 +59,11 @@ const AIAssistant = () => {
       }
 
       const data = await response.json();
-      console.log('API response:', data);
-
-      const aiReply = data?.reply?.trim();
+      const aiReply = data?.response?.trim(); // ✅ Fixed here
 
       const aiResponse = {
         id: messages.length + 2,
-        text: aiReply || "Sorry, I didn't get a valid response from the server.",
+        text: aiReply || "மன்னிக்கவும், சரியான பதிலை பெற முடியவில்லை.",
         sender: 'ai',
         timestamp: new Date()
       };
@@ -75,7 +73,7 @@ const AIAssistant = () => {
       console.error('Error fetching AI response:', error);
       const errorResponse = {
         id: messages.length + 2,
-        text: "Oops! Something went wrong. Please try again later.",
+        text: "மன்னிக்கவும்! ஏதோ தவறு ஏற்பட்டது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்.",
         sender: 'ai',
         timestamp: new Date()
       };
@@ -109,6 +107,7 @@ const AIAssistant = () => {
             ? 'bg-red-500 hover:bg-red-600'
             : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
         } text-white flex items-center justify-center`}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </button>
@@ -122,8 +121,8 @@ const AIAssistant = () => {
               <Bot size={18} />
             </div>
             <div>
-              <h3 className="font-semibold">AI Assistant</h3>
-              <p className="text-xs opacity-90">Online</p>
+              <h3 className="font-semibold">செல்வி உதவியாளர்</h3>
+              <p className="text-xs opacity-90">இணையத்தில்</p>
             </div>
           </div>
 
@@ -188,12 +187,12 @@ const AIAssistant = () => {
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
+                placeholder="உங்கள் செய்தியை টাইப் செய்யவும்..."
                 className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button
                 onClick={handleSendMessage}
-                disabled={!inputMessage.trim()}
+                disabled={!inputMessage.trim() || isTyping}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send size={18} />
