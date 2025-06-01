@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import React from 'react';
 
 const ProductGallery = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('all');
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
@@ -243,6 +245,17 @@ const ProductGallery = () => {
     }));
   };
 
+  // Handle navigation to product detail page
+  const handleViewDetails = (product) => {
+    // You can pass the product data as state if needed
+    navigate('/product', { 
+      state: { 
+        product: product,
+        quantity: quantities[product.id]
+      } 
+    });
+  };
+
   const categories = [
     { id: 'all', name: 'Show All' },
     { id: 'new', name: 'New Products' },
@@ -289,6 +302,7 @@ const ProductGallery = () => {
               quantity={quantities[product.id]}
               onDecrement={() => decrementQuantity(product.id)}
               onIncrement={() => incrementQuantity(product.id)}
+              onViewDetails={() => handleViewDetails(product)}
             />
           ))}
         </div>
@@ -377,7 +391,7 @@ const ImageSlideshow = ({ images }) => {
 };
 
 // Enhanced Product Card Component with Image Slideshow
-const ProductCard = ({ product, index, quantity, onDecrement, onIncrement }) => {
+const ProductCard = ({ product, index, quantity, onDecrement, onIncrement, onViewDetails }) => {
   // Ensure we have a valid images array, fallback to single image if not
   const productImages = product.images && product.images.length > 0 
     ? product.images 
@@ -422,7 +436,10 @@ const ProductCard = ({ product, index, quantity, onDecrement, onIncrement }) => 
         </div>
         
         {/* View Price and Details Button */}
-        <button className="w-4/5 mx-auto mt-3 bg-amber-500 hover:bg-amber-600 py-2 rounded-lg text-white font-medium transition-colors text-xs sm:text-sm">
+        <button 
+          onClick={onViewDetails}
+          className="w-4/5 mx-auto mt-3 bg-amber-500 hover:bg-amber-600 py-2 rounded-lg text-white font-medium transition-colors text-xs sm:text-sm"
+        >
           View Price and Details
         </button>
       </div>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 const Legacy = () => {
-  const fadeInRefs = useRef([]);
+  const badgeRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -17,23 +17,16 @@ const Legacy = () => {
       { threshold: 0.1 }
     );
 
-    fadeInRefs.current.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
+    if (badgeRef.current) {
+      observer.observe(badgeRef.current);
+    }
 
     return () => {
-      fadeInRefs.current.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
+      if (badgeRef.current) {
+        observer.unobserve(badgeRef.current);
+      }
     };
   }, []);
-
-  // Add refs to the array
-  const addToRefs = (el) => {
-    if (el && !fadeInRefs.current.includes(el)) {
-      fadeInRefs.current.push(el);
-    }
-  };
 
   return (
     <section id="legacy" className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-amber-50 to-amber-100 relative overflow-hidden font-['Murecho']">
@@ -44,21 +37,19 @@ const Legacy = () => {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div 
-          ref={addToRefs} 
-          className="text-center mb-16 opacity-0 translate-y-10 transition-all duration-1000"
-        >
+        <div className="text-center mb-16">
           <h2 className="text-4xl font-['Murecho'] font-bold text-amber-800 mb-4">
-            Our Legacy
+            Legacy
           </h2>
           
-          {/* Ribbon badge image */}
+          {/* Ribbon badge image - Only animated element */}
           <div className="flex justify-center mb-6">
             <div className="relative">
               <img 
+                ref={badgeRef}
                 src="/images/85_years.png" 
                 alt="85 Years of Excellence" 
-                className="h-56 w-auto mx-auto transform hover:scale-105 transition-transform duration-300"
+                className="h-56 w-auto mx-auto transform hover:scale-105 transition-all duration-1000 opacity-0 translate-y-10"
               />
             </div>
           </div>
@@ -69,13 +60,10 @@ const Legacy = () => {
           </p>
         </div>
 
-        {/* Legacy Cards with enhanced styling based on your example */}
+        {/* Legacy Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Legacy Card 1 - Founded in 1965 */}
-          <div 
-            ref={addToRefs}
-            className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 opacity-0 translate-y-10 group hover:-translate-y-2"
-          >
+          <div className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 group hover:-translate-y-2">
             <div className="p-6 pb-4">
               <h3 className="text-2xl font-['Murecho'] font-bold text-amber-300 mb-2">Founded in 1965</h3>
               <div className="border-b border-amber-300/30 w-16 mb-4"></div>
@@ -116,11 +104,7 @@ const Legacy = () => {
           </div>
 
           {/* Legacy Card 2 - Traditional Methods */}
-          <div 
-            ref={addToRefs}
-            className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 opacity-0 translate-y-10 group hover:-translate-y-2"
-            style={{ transitionDelay: '200ms' }}
-          >
+          <div className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 group hover:-translate-y-2">
             <div className="p-6 pb-4">
               <h3 className="text-2xl font-['Murecho'] font-bold text-amber-300 mb-2">Traditional Methods</h3>
               <div className="border-b border-amber-300/30 w-16 mb-4"></div>
@@ -161,11 +145,7 @@ const Legacy = () => {
           </div>
 
           {/* Legacy Card 3 - Award Winning */}
-          <div 
-            ref={addToRefs}
-            className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 opacity-0 translate-y-10 group hover:-translate-y-2"
-            style={{ transitionDelay: '400ms' }}
-          >
+          <div className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 group hover:-translate-y-2">
             <div className="p-6 pb-4">
               <h3 className="text-2xl font-['Murecho'] font-bold text-amber-300 mb-2">Award Winning</h3>
               <div className="border-b border-amber-300/30 w-16 mb-4"></div>
@@ -199,8 +179,6 @@ const Legacy = () => {
                   <p className="text-amber-200 font-medium">National recognition</p>
                 </div>
               </div>
-
-              
               
               {/* Gold border effect on hover */}
               <div className="absolute inset-0 border-2 border-amber-300/0 rounded-xl transition-all duration-300 group-hover:border-amber-300/70"></div>
@@ -208,77 +186,113 @@ const Legacy = () => {
           </div>
         </div>
 
-        {/* Timeline with enhanced styling */}
-        <div 
-          ref={addToRefs}
-          className="mt-24 relative opacity-0 translate-y-10 transition-all duration-1000"
-          style={{ transitionDelay: '600ms' }}
-        >
-          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-amber-200 via-amber-400 to-amber-300"></div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
-            {/* First milestone */}
-            <div className="md:text-right md:pr-12 pb-12 relative group">
-              <div className="absolute right-0 md:right-0 top-0 w-4 h-4 rounded-full bg-amber-600 md:mr-0 mr-auto md:ml-0 transform md:translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
-              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">1965: Humble Beginnings</h3>
-              <p className="text-amber-800">
-                Kumarran Vilas opened its doors as a small boutique in the heart of the city, focusing on handcrafted jewelry.
-              </p>
-              <div className="hidden md:block mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">58 years ago</div>
+        {/* Timeline - Mobile Friendly Design */}
+        <div className="mt-24 relative">
+          {/* Mobile Timeline */}
+          <div className="block md:hidden">
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-amber-200 via-amber-400 to-amber-300"></div>
+            
+            <div className="space-y-12">
+              {/* Mobile milestone 1 */}
+              <div className="relative pl-16">
+                <div className="absolute left-6 top-1 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-2 ring-4 ring-amber-200"></div>
+                <h3 className="text-lg font-serif font-bold text-amber-900 mb-2">1965: Humble Beginnings</h3>
+                <p className="text-amber-800 text-sm">
+                  Kumarran Vilas opened its doors as a small boutique in the heart of the city, focusing on handcrafted jewelry.
+                </p>
+              </div>
+
+              {/* Mobile milestone 2 */}
+              <div className="relative pl-16">
+                <div className="absolute left-6 top-1 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-2 ring-4 ring-amber-200"></div>
+                <h3 className="text-lg font-serif font-bold text-amber-900 mb-2">1985: Expansion</h3>
+                <p className="text-amber-800 text-sm">
+                  After two decades of success, we expanded our offerings to include a wider range of artisanal products.
+                </p>
+              </div>
+
+              {/* Mobile milestone 3 */}
+              <div className="relative pl-16">
+                <div className="absolute left-6 top-1 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-2 ring-4 ring-amber-200"></div>
+                <h3 className="text-lg font-serif font-bold text-amber-900 mb-2">2005: National Recognition</h3>
+                <p className="text-amber-800 text-sm">
+                  Our dedication to quality was recognized with prestigious national awards for craftsmanship excellence.
+                </p>
+              </div>
+
+              {/* Mobile milestone 4 */}
+              <div className="relative pl-16">
+                <div className="absolute left-6 top-1 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-2 ring-4 ring-amber-200"></div>
+                <h3 className="text-lg font-serif font-bold text-amber-900 mb-2">Today: A Living Heritage</h3>
+                <p className="text-amber-800 text-sm">
+                  Now a household name, Kumarran Vilas continues to blend traditional craftsmanship with contemporary designs.
+                </p>
               </div>
             </div>
-            <div className="md:pl-12 pb-12 md:block hidden"></div>
+          </div>
 
-            {/* Second milestone */}
-            <div className="md:pl-12 pb-12 md:block hidden"></div>
-            <div className="md:text-left md:pl-12 pb-12 relative group">
-              <div className="absolute left-0 md:left-0 top-0 w-4 h-4 rounded-full bg-amber-600 md:ml-0 ml-auto md:mr-0 transform md:-translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
-              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">1985: Expansion</h3>
-              <p className="text-amber-800">
-                After two decades of success, we expanded our offerings to include a wider range of artisanal products.
-              </p>
-              <div className="hidden md:block mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">40 years ago</div>
+          {/* Desktop Timeline */}
+          <div className="hidden md:block">
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-amber-200 via-amber-400 to-amber-300"></div>
+            
+            <div className="grid grid-cols-2 gap-8 relative">
+              {/* First milestone */}
+              <div className="text-right pr-12 pb-12 relative group">
+                <div className="absolute right-0 top-0 w-4 h-4 rounded-full bg-amber-600 transform translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
+                <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">1965: Humble Beginnings</h3>
+                <p className="text-amber-800">
+                  Kumarran Vilas opened its doors as a small boutique in the heart of the city, focusing on handcrafted jewelry.
+                </p>
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">58 years ago</div>
+                </div>
               </div>
-            </div>
+              <div className="pl-12 pb-12"></div>
 
-            {/* Third milestone */}
-            <div className="md:text-right md:pr-12 pb-12 relative group">
-              <div className="absolute right-0 md:right-0 top-0 w-4 h-4 rounded-full bg-amber-600 md:mr-0 mr-auto md:ml-0 transform md:translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
-              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">2005: National Recognition</h3>
-              <p className="text-amber-800">
-                Our dedication to quality was recognized with prestigious national awards for craftsmanship excellence.
-              </p>
-              <div className="hidden md:block mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">20 years ago</div>
+              {/* Second milestone */}
+              <div className="pl-12 pb-12"></div>
+              <div className="text-left pl-12 pb-12 relative group">
+                <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
+                <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">1985: Expansion</h3>
+                <p className="text-amber-800">
+                  After two decades of success, we expanded our offerings to include a wider range of artisanal products.
+                </p>
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">40 years ago</div>
+                </div>
               </div>
-            </div>
-            <div className="md:pl-12 pb-12 md:block hidden"></div>
 
-            {/* Fourth milestone */}
-            <div className="md:pl-12 pb-12 md:block hidden"></div>
-            <div className="md:text-left md:pl-12 relative group">
-              <div className="absolute left-0 md:left-0 top-0 w-4 h-4 rounded-full bg-amber-600 md:ml-0 ml-auto md:mr-0 transform md:-translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
-              <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">Today: A Living Heritage</h3>
-              <p className="text-amber-800">
-                Now a household name, Kumarran Vilas continues to blend traditional craftsmanship with contemporary designs.
-              </p>
-              <div className="hidden md:block mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">Present day</div>
+              {/* Third milestone */}
+              <div className="text-right pr-12 pb-12 relative group">
+                <div className="absolute right-0 top-0 w-4 h-4 rounded-full bg-amber-600 transform translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
+                <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">2005: National Recognition</h3>
+                <p className="text-amber-800">
+                  Our dedication to quality was recognized with prestigious national awards for craftsmanship excellence.
+                </p>
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">20 years ago</div>
+                </div>
+              </div>
+              <div className="pl-12 pb-12"></div>
+
+              {/* Fourth milestone */}
+              <div className="pl-12 pb-12"></div>
+              <div className="text-left pl-12 relative group">
+                <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-amber-600 transform -translate-x-6 translate-y-1.5 ring-4 ring-amber-200 group-hover:ring-amber-300 transition-all duration-300"></div>
+                <h3 className="text-xl font-serif font-bold text-amber-900 mb-2">Today: A Living Heritage</h3>
+                <p className="text-amber-800">
+                  Now a household name, Kumarran Vilas continues to blend traditional craftsmanship with contemporary designs.
+                </p>
+                <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">Present day</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-
-
         {/* Quote section */}
-        <div
-          ref={addToRefs}
-          className="mt-24 text-center opacity-0 translate-y-10 transition-all duration-1000"
-          style={{ transitionDelay: '800ms' }}
-        >
+        <div className="mt-24 text-center">
           <div className="relative max-w-4xl mx-auto p-8 bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-200 shadow-lg">
             <div className="text-amber-400 opacity-20 absolute top-4 left-4">
               <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24">

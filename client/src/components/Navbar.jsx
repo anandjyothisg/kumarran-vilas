@@ -115,7 +115,7 @@ const Navbar = ({ scrollY }) => {
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gradient-to-b from-amber-50/95 to-white/80 backdrop-blur-xl border-t border-amber-800/20 shadow-lg">
           <MobileNavLink href="#home">Home</MobileNavLink>
-          <MobileNavLink href="#legacy">Our Legacy</MobileNavLink>
+          <MobileNavLink href="#legacy">Legacy</MobileNavLink>
           <MobileNavLink href="#story">Our Story</MobileNavLink>
           <MobileNavLink href="#products">Products</MobileNavLink>
           <MobileNavLink href="#contact">Contact</MobileNavLink>
