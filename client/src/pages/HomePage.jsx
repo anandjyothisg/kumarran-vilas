@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import Navbar from './Navbar';
-import Hero from './Hero';
-import Legacy from './Legacy';
-import Story from './Story';
-import ProductGallery from './ProductGallery';
-import Footer from './Footer';
-import ProductStage from './ProductStage';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import Legacy from '../components/Legacy';
+import Story from '../components/Story';
+import ProductGallery from '../components/ProductGallery';
+import Footer from '../components/Footer';
+import ProductStage from '../components/ProductStage';
+import AIAssistant from '../components/AIChat.jsx';
 
 const HomePage = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -28,6 +29,7 @@ const HomePage = () => {
       <ProductGallery />
       <Story />
       <Footer />
+      <AIAssistant />
     </div>
   );
 };

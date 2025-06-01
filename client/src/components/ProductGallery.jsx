@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Add this import
 import React from 'react';
 
 const ProductGallery = () => {
+  const navigate = useNavigate(); // Add this hook
   const [activeCategory, setActiveCategory] = useState('all');
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
@@ -243,9 +245,14 @@ const ProductGallery = () => {
     }));
   };
 
-  // Handle navigation to product detail page
+  // Handle navigation to product detail page - UPDATED
   const handleViewDetails = (product) => {
-    alert(`Viewing details for: ${product.name}\nPrice: ${product.price}\nQuantity: ${quantities[product.id]}`);
+    navigate('/product', {
+      state: {
+        product: product,
+        quantity: quantities[product.id]
+      }
+    });
   };
 
   const categories = [

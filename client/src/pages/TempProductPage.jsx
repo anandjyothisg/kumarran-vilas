@@ -1,7 +1,9 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import ProductDetailPage from "./ProductDetailPage";
-import Footerpage from "./Footer";
+import Navbar from '../components/Navbar';
+import ProductDetailPage from "../components/ProductDetailPage";
+import Footerpage from "../components/Footer";
+import AIAssistant from '../components/AIChat.jsx';
 
 function ProductPage() {
   const location = useLocation();
@@ -10,11 +12,13 @@ function ProductPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
+        <Navbar scrollY={scrollY} />
         <ProductDetailPage product={product} quantity={quantity} />
       </main>
       <footer>
         <Footerpage />
       </footer>
+      <AIAssistant />
     </div>
   );
 }

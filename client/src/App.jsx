@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoadingPage from './components/LoadingPage';
-import HomePage from './components/HomePage';
-import ProductPage from './components/TempProductPage';
+import HomePage from './pages/HomePage';
+import ProductPage from './pages/TempProductPage'; // Keep this as is if your file is named TempProductPage
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +32,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product" element={<ProductPage />} />
+          <Route path="/product/:id" element={<ProductPage />} /> {/* Add this for product IDs */}
           {/* Add more routes here if needed */}
         </Routes>
       ) : (
