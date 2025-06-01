@@ -44,17 +44,37 @@ const AIAssistant = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI response (replace this with your backend integration)
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:5000/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: newMessage.text })
+      });
+
+      const data = await response.json();
+
       const aiResponse = {
         id: messages.length + 2,
-        text: "Thank you for your message! I'm currently being set up to connect with the backend. Soon I'll be able to provide more helpful responses about your products and services.",
+        text: data.reply || "Sorry, I didn't get a response from the server.",
         sender: 'ai',
         timestamp: new Date()
       };
+
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      const errorResponse = {
+        id: messages.length + 2,
+        text: "Oops! Something went wrong. Please try again later.",
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+      console.error('Error fetching AI response:', error);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e) => {
