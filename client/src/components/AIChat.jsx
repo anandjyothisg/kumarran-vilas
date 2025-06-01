@@ -1,208 +1,111 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { Bot, User, SendHorizonal, Loader2 } from 'lucide-react';
 
 const AIAssistant = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "Hello! I'm your AI assistant Rani. How can I help you today?",
-      sender: 'ai',
-      timestamp: new Date()
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const chatRef = useRef(null);
 
   useEffect(() => {
-    scrollToBottom();
+    chatRef.current?.scrollTo(0, chatRef.current.scrollHeight);
   }, [messages]);
 
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+  const handleSend = async () => {
+    if (!input.trim()) return;
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-
-    const newMessage = {
-      id: messages.length + 1,
-      text: inputMessage,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setInputMessage('');
-    setIsTyping(true);
+    const userMessage = { sender: 'user', text: input };
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setLoading(true);
 
     try {
-      const response = await fetch("https://kumarran-vilas.onrender.com/chat", {
+      const res = await fetch('https://kumarran-vilas.onrender.com/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: newMessage.text })
+        body: JSON.stringify({ message: input }),
       });
 
-      if (!response.ok) {
-        console.error('Server responded with non-200:', response.status);
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const aiReply = data?.response?.trim();
-
-      const aiResponse = {
-        id: messages.length + 2,
-        text: aiReply || "Sorry, I couldn't fetch a proper response.",
-        sender: 'ai',
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, aiResponse]);
-    } catch (error) {
-      console.error('Error fetching AI response:', error);
-      const errorResponse = {
-        id: messages.length + 2,
-        text: "Sorry! Something went wrong. Please try again.",
-        sender: 'ai',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorResponse]);
+      const data = await res.json();
+      const aiReply = { sender: 'ai', text: data.reply || '⚠️ Rani did not respond.' };
+      setMessages(prev => [...prev, aiReply]);
+    } catch (err) {
+      setMessages(prev => [...prev, { sender: 'ai', text: '⚠️ An error occurred. Please try again.' }]);
     } finally {
-      setIsTyping(false);
+      setLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') handleSend();
   };
 
   return (
-    <>
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 ${
-          isOpen
-            ? 'bg-red-500 hover:bg-red-600'
-            : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
-        } text-white flex items-center justify-center`}
-        aria-label={isOpen ? "Close chat" : "Open chat"}
-      >
-        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
-      </button>
-
-      {/* Chat Window */}
-      {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 w-80 h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 flex items-center gap-3">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <Bot size={18} />
-            </div>
-            <div>
-              <h3 className="font-bold">Rani</h3>
-              <h3 className="font-semibold">The AI-Assistant</h3>
-              <p className="text-xs opacity-90">Online</p>
-            </div>
+    <div className="fixed bottom-4 right-4 z-50">
+      {open ? (
+        <div className="w-80 bg-white rounded-2xl shadow-lg flex flex-col">
+          <div className="bg-blue-600 text-white p-3 rounded-t-2xl font-semibold flex justify-between items-center">
+            <span>🛕 Rani AI Assistant</span>
+            <button onClick={() => setOpen(false)}>✖</button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.map((message) => (
+          <div ref={chatRef} className="h-96 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
+            {messages.map((msg, idx) => (
               <div
-                key={message.id}
-                className={`flex gap-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                key={idx}
+                className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
-                {message.sender === 'ai' && (
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot size={16} className="text-white" />
-                  </div>
-                )}
                 <div
-                  className={`max-w-[70%] rounded-lg p-3 ${
-                    message.sender === 'user'
-                      ? 'bg-blue-500 text-white rounded-br-sm'
-                      : 'bg-white text-gray-800 rounded-bl-sm shadow-sm'
+                  className={`rounded-xl px-3 py-2 max-w-[75%] ${
+                    msg.sender === 'user'
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-900'
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
-                  <p className={`text-xs mt-1 ${
-                    message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                  }`}>
-                    {formatTime(message.timestamp)}
-                  </p>
+                  {msg.text}
                 </div>
-                {message.sender === 'user' && (
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User size={16} className="text-gray-600" />
-                  </div>
-                )}
               </div>
             ))}
-
-            {/* Typing Indicator */}
-            {isTyping && (
-              <div className="flex gap-3 justify-start">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot size={16} className="text-white" />
-                </div>
-                <div className="bg-white text-gray-800 rounded-lg rounded-bl-sm shadow-sm p-3">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  </div>
+            {loading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-200 px-3 py-2 rounded-xl flex items-center">
+                  <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                  Rani is typing...
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-4 bg-white border-t border-gray-200">
-            <div className="flex gap-2">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isTyping}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send size={18} />
-              </button>
-            </div>
+          <div className="flex items-center border-t px-2 py-2 bg-white">
+            <input
+              type="text"
+              className="flex-1 border rounded-xl px-3 py-2 text-sm mr-2"
+              placeholder="Type your question..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button
+              className="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600"
+              onClick={handleSend}
+              disabled={loading}
+            >
+              <SendHorizonal className="w-4 h-4" />
+            </button>
           </div>
         </div>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-full shadow-md hover:bg-blue-700"
+        >
+          💬 Rani
+        </button>
       )}
-    </>
+    </div>
   );
 };
 
