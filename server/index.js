@@ -15,6 +15,7 @@ app.use(cors({
   methods: ["GET", "POST"],
   credentials: true,
 }));
+
 app.use(express.json());
 
 const groq = new Groq({
@@ -55,12 +56,15 @@ To preserve and spread traditional spiritual values through pure, high-quality p
 - Known for punctual delivery, honesty, and spiritual authenticity.
 
 💬 **Response Guidelines:**
-- Detect and respond in the language the user uses: Tamil or English.
+- Before answering, detect the language of the user query:
+  - If the query is in English, respond ONLY in English.
+  - If the query is in Tamil, respond ONLY in Tamil.
+  - Do NOT default to Tamil for all queries.
 - Keep replies short, polite, and accurate.
 - Always focus only on the shop, its products, services, and legacy.
 - Do not provide unrelated spiritual guidance or personal opinions.
 
-Your tone must reflect humility, trust, and confidence — just like a knowledgeable, helpful assistant at a temple town heritage shop.
+Your tone must reflect humility, trust, and confidence — like a knowledgeable, helpful assistant at a temple town heritage shop.
 `;
 
 app.get("/", (req, res) => {
@@ -75,16 +79,23 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
+    const fullPrompt = `
+${shopPrompt}
+
+User Query:
+"""${message}"""
+`;
+
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: shopPrompt },
+        { role: "system", content: fullPrompt },
         { role: "user", content: message }
       ],
       model: "mistral-saba-24b",
-      temperature: 0.7,
+      temperature: 0.3,
       max_tokens: 180,
       top_p: 1,
-      stream: false
+      stream: false,
     });
 
     const aiReply = chatCompletion.choices?.[0]?.message?.content || "⚠️ Rani didn't respond.";
