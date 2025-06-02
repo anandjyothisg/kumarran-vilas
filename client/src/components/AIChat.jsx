@@ -6,13 +6,31 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const chatRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (chatRef.current) {
       chatRef.current.scrollTo(0, chatRef.current.scrollHeight);
     }
   }, [messages]);
+
+  // Handle viewport changes for mobile keyboard
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined' && window.visualViewport) {
+        const viewport = window.visualViewport;
+        const keyboardOpen = viewport.height < window.innerHeight;
+        setKeyboardHeight(keyboardOpen ? window.innerHeight - viewport.height : 0);
+      }
+    };
+
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+      return () => window.visualViewport.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
@@ -46,6 +64,14 @@ const AIAssistant = () => {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleInputFocus = () => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 300);
   };
 
   return (
@@ -143,6 +169,7 @@ const AIAssistant = () => {
           background: linear-gradient(135deg, #FFD700, #FFA500);
           position: relative;
           overflow: hidden;
+          flex-shrink: 0;
         }
         
         .send-button::before {
@@ -174,6 +201,8 @@ const AIAssistant = () => {
           border: 2px solid #791603;
           position: relative;
           background: linear-gradient(135deg, rgba(255, 248, 220, 0.8), rgba(255, 235, 59, 0.1));
+          flex-grow: 1;
+          min-width: 0;
         }
         
         .input-field:focus {
@@ -242,25 +271,93 @@ const AIAssistant = () => {
             height: 100% !important;
             border-radius: 0 !important;
             max-width: none !important;
+            display: flex;
+            flex-direction: column;
           }
           
           .mobile-header {
-            padding: 1rem 1rem 0.75rem 1rem !important;
+            padding: 1.25rem 1rem 0.75rem 1rem !important;
+            flex-shrink: 0;
           }
           
           .mobile-messages {
-            padding: 1rem 0.75rem !important;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 0.75rem 0.5rem 0.75rem !important;
+            min-height: 0;
           }
           
-          .mobile-input {
-            padding: 1rem !important;
+          .mobile-input-container {
+            flex-shrink: 0;
+            padding: 0.75rem 1rem 1rem 1rem !important;
+            background: linear-gradient(to right, rgb(255, 251, 235), rgb(254, 240, 138));
+            border-top: 1px solid rgb(252, 211, 77);
+            position: relative;
+            z-index: 10;
+          }
+          
+          .mobile-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 100%;
+          }
+          
+          .mobile-input-field {
+            flex: 1;
+            min-width: 0;
+            border-radius: 1rem;
+            padding: 0.875rem 1rem;
+            font-size: 16px;
+            border: 2px solid #791603;
+            background: linear-gradient(135deg, rgba(255, 248, 220, 0.9), rgba(255, 235, 59, 0.1));
+          }
+          
+          .mobile-input-field:focus {
+            border-color: #791603;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            outline: none;
+          }
+          
+          .mobile-send-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 1rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+          }
+          
+          .mobile-send-button:hover {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
+          }
+          
+          .mobile-send-button:active {
+            transform: scale(0.95);
           }
           
           .mobile-close {
             position: absolute !important;
-            top: 1rem !important;
+            top: 1.25rem !important;
             right: 1rem !important;
-            z-index: 10 !important;
+            z-index: 20 !important;
+            width: 40px;
+            height: 40px;
+          }
+          
+          /* Prevent zoom on input focus */
+          input[type="text"] {
+            font-size: 16px !important;
+          }
+          
+          /* Handle keyboard spacing */
+          .keyboard-adjusted {
+            padding-bottom: env(keyboard-inset-height, 0px);
           }
         }
         
@@ -290,6 +387,14 @@ const AIAssistant = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: linear-gradient(135deg, #8B1E0A, #791603);
         }
+
+        /* Prevent body scroll when chat is open on mobile */
+        .no-scroll {
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
       `}</style>
       
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 luxury-chat">
@@ -297,11 +402,16 @@ const AIAssistant = () => {
           <>
             {/* Mobile overlay */}
             <div className="sm:hidden mobile-overlay mobile-chat">
-              <div className="mobile-chat-container bg-white flex flex-col overflow-hidden">
+              <div 
+                className="mobile-chat-container bg-white overflow-hidden"
+                style={{ 
+                  paddingBottom: keyboardHeight ? `${Math.max(keyboardHeight - 50, 0)}px` : '0px' 
+                }}
+              >
                 {/* Mobile close button */}
                 <button 
                   onClick={() => setOpen(false)}
-                  className="mobile-close close-button w-10 h-10 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg"
+                  className="mobile-close close-button rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg"
                   title="Close Chat"
                 >
                   <X className="w-5 h-5" />
@@ -309,7 +419,7 @@ const AIAssistant = () => {
                 
                 {/* Header */}
                 <div className="mobile-header maroon-gradient text-white relative overflow-hidden">
-                  <div className="relative flex justify-center items-center pt-8">
+                  <div className="relative flex justify-center items-center pt-6">
                     <div className="flex items-center gap-3">
                       <div>
                         <h3 className="font-bold text-xl">🛕 Rani AI</h3>
@@ -322,68 +432,74 @@ const AIAssistant = () => {
                 </div>
 
                 {/* Messages */}
-                <div ref={chatRef} className="mobile-messages flex-1 overflow-y-auto space-y-4 chat-background custom-scrollbar">
-                  {messages.length === 0 && (
-                    <div className="text-center py-12">
-                      <div className="text-8xl mb-4">👑</div>
-                      <p className="text-gray-600 font-medium text-lg">Welcome to Rani AI</p>
-                      <p className="text-sm text-gray-500 mt-2">Your royal assistant awaits your command</p>
-                    </div>
-                  )}
-                  
-                  {messages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`rounded-2xl px-4 py-3 max-w-[85%] font-medium shadow-lg ${
-                          msg.sender === 'user'
-                            ? 'message-gradient-user text-white shadow-red-900/30'
-                            : 'message-gradient-ai shadow-yellow-400/30'
-                        }`}
-                      >
-                        {msg.sender === 'ai' && (
-                          <div className="flex items-center gap-2 mb-1">
-                            <Sparkles className="w-3 h-3" />
-                            <span className="text-xs font-bold opacity-80">RANI</span>
-                          </div>
-                        )}
-                        <div className="relative z-10">{msg.text}</div>
+                <div ref={chatRef} className="mobile-messages chat-background custom-scrollbar">
+                  <div className="space-y-4">
+                    {messages.length === 0 && (
+                      <div className="text-center py-12">
+                        <div className="text-8xl mb-4">👑</div>
+                        <p className="text-gray-600 font-medium text-lg">Welcome to Rani AI</p>
+                        <p className="text-sm text-gray-500 mt-2">Your royal assistant awaits your command</p>
                       </div>
-                    </div>
-                  ))}
-                  
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="typing-indicator px-4 py-3 rounded-2xl flex items-center font-medium shadow-lg shadow-yellow-400/30">
-                        <Loader2 className="animate-spin w-4 h-4 mr-3" />
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-3 h-3" />
-                          <span className="text-xs font-bold relative z-10">Rani is crafting a response...</span>
+                    )}
+                    
+                    {messages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`rounded-2xl px-4 py-3 max-w-[85%] font-medium shadow-lg ${
+                            msg.sender === 'user'
+                              ? 'message-gradient-user text-white shadow-red-900/30'
+                              : 'message-gradient-ai shadow-yellow-400/30'
+                          }`}
+                        >
+                          {msg.sender === 'ai' && (
+                            <div className="flex items-center gap-2 mb-1">
+                              <Sparkles className="w-3 h-3" />
+                              <span className="text-xs font-bold opacity-80">RANI</span>
+                            </div>
+                          )}
+                          <div className="relative z-10">{msg.text}</div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                    
+                    {loading && (
+                      <div className="flex justify-start">
+                        <div className="typing-indicator px-4 py-3 rounded-2xl flex items-center font-medium shadow-lg shadow-yellow-400/30">
+                          <Loader2 className="animate-spin w-4 h-4 mr-3" />
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-3 h-3" />
+                            <span className="text-xs font-bold relative z-10">Rani is crafting a response...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Input */}
-                <div className="mobile-input flex items-center gap-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-t border-yellow-200">
-                  <input
-                    type="text"
-                    className="input-field flex-1 rounded-2xl px-4 py-3 font-medium placeholder-gray-500 transition-all duration-300"
-                    placeholder="Ask Rani anything..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <button
-                    className="send-button text-white rounded-2xl p-3 disabled:opacity-50 font-bold hover:scale-105 transition-all duration-300 shadow-lg"
-                    onClick={handleSend}
-                    disabled={loading}
-                  >
-                    <SendHorizonal className="w-5 h-5" />
-                  </button>
+                <div className="mobile-input-container" ref={inputRef}>
+                  <div className="mobile-input-wrapper">
+                    <input
+                      type="text"
+                      className="mobile-input-field font-medium placeholder-gray-500 transition-all duration-300"
+                      placeholder="Ask Rani anything..."
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      onFocus={handleInputFocus}
+                      disabled={loading}
+                    />
+                    <button
+                      className="mobile-send-button font-bold transition-all duration-300"
+                      onClick={handleSend}
+                      disabled={loading || !input.trim()}
+                    >
+                      <SendHorizonal className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -465,7 +581,7 @@ const AIAssistant = () => {
                 <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-t border-yellow-200">
                   <input
                     type="text"
-                    className="input-field flex-1 rounded-2xl px-4 py-3 text-sm font-medium placeholder-gray-500 transition-all duration-300"
+                    className="input-field rounded-2xl px-4 py-3 text-sm font-medium placeholder-gray-500 transition-all duration-300"
                     placeholder="Ask Rani anything..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
