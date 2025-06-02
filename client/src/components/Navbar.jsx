@@ -32,7 +32,8 @@ const Navbar = ({ scrollY }) => {
         backdropFilter: `blur(${navbarBlur}px)`,
         boxShadow: scrollY > 20 
           ? '0 4px 30px rgba(153, 27, 27, 0.15), 0 0 10px rgba(153, 27, 27, 0.05)' 
-          : 'none'
+          : 'none',
+        fontFamily: 'Red Rose, cursive'
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -133,6 +134,7 @@ const NavLink = ({ href, children, isActive, onHover }) => {
       className={`px-4 py-2 rounded-md text-sm font-medium text-red-900 transition-all duration-500 ease-in-out relative overflow-hidden ${
         isActive ? 'bg-amber-100/30' : ''
       }`}
+      style={{ fontFamily: 'Red Rose, cursive' }}
       onMouseEnter={onHover}
       onMouseLeave={() => onHover(null)}
     >
@@ -153,6 +155,7 @@ const MobileNavLink = ({ href, children }) => {
     <a
       href={href}
       className="block px-3 py-3 rounded-md text-base font-medium text-red-900 hover:text-red-800 hover:bg-amber-200/40 transition-all duration-500 ease-in-out transform hover:translate-x-2 group"
+      style={{ fontFamily: 'Red Rose, cursive' }}
     >
       <div className="flex items-center">
         <span className="mr-2 opacity-0 transition-all duration-500 ease-in-out transform -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0">•</span>

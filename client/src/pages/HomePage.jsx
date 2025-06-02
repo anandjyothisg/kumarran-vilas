@@ -25,7 +25,12 @@ const HomePage = () => {
       <Navbar scrollY={scrollY} />
       <Hero />
       <Legacy />
-      <ProductStage />
+      
+      {/* ProductStage with extra spacing on mobile to account for scale transform */}
+      <div className="mb-16 md:mb-0">
+        <ProductStage />
+      </div>
+      
       <ProductGallery />
       <Story />
       <Footer />

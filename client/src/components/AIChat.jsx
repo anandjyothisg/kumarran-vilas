@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { SendHorizonal, Loader2, Crown, Sparkles, ChevronDown } from 'lucide-react';
+import { SendHorizonal, Loader2, Crown, Sparkles, ChevronDown, X } from 'lucide-react';
 
 const AIAssistant = () => {
   const [open, setOpen] = useState(false);
@@ -15,7 +15,7 @@ const AIAssistant = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = { sender: 'user', text: input };
     setMessages(prev => [...prev, userMessage]);
@@ -42,7 +42,8 @@ const AIAssistant = () => {
   };
 
   const handleKeyDown = e => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
       handleSend();
     }
   };
@@ -64,27 +65,91 @@ const AIAssistant = () => {
         
         .maroon-gradient {
           background: linear-gradient(135deg, #791603, #8B1E0A, #6B1403);
+          position: relative;
+        }
+        
+        .maroon-gradient::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: 
+            radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.1) 0%, transparent 50%),
+            linear-gradient(45deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+          background-size: 200px 200px, 150px 150px, 100% 100%;
+          animation: textureMove 8s ease-in-out infinite;
         }
         
         .message-gradient-user {
           background: linear-gradient(135deg, #791603, #8B1E0A);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .message-gradient-user::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+          animation: messageShine 2s ease-in-out infinite;
         }
         
         .message-gradient-ai {
           background: linear-gradient(135deg, #FFD700, #FFA500);
           color: #791603;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .message-gradient-ai::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: 
+            radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+            linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+          background-size: 100px 100px, 100% 100%;
         }
         
         .floating-button {
           background: linear-gradient(135deg, #791603, #8B1E0A);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .floating-button::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: 
+            radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
+            linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
         }
         
         .close-button {
           background: linear-gradient(135deg, #791603, #8B1E0A);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .close-button::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
         }
         
         .send-button {
           background: linear-gradient(135deg, #FFD700, #FFA500);
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .send-button::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
         }
         
         .send-button:hover {
@@ -94,10 +159,21 @@ const AIAssistant = () => {
         .typing-indicator {
           background: linear-gradient(135deg, #FFD700, #FFA500);
           color: #791603;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .typing-indicator::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
         }
         
         .input-field {
           border: 2px solid #791603;
+          position: relative;
+          background: linear-gradient(135deg, rgba(255, 248, 220, 0.8), rgba(255, 235, 59, 0.1));
         }
         
         .input-field:focus {
@@ -106,118 +182,316 @@ const AIAssistant = () => {
           outline: none;
         }
         
+        .chat-background {
+          background: 
+            radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(255, 165, 0, 0.05) 0%, transparent 50%),
+            linear-gradient(to bottom, #fffbf0, #fef3c7);
+          position: relative;
+        }
+        
+        .chat-background::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: 
+            repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255, 215, 0, 0.03) 2px, rgba(255, 215, 0, 0.03) 4px);
+          animation: patternMove 20s linear infinite;
+        }
+        
+        .mobile-overlay {
+          background: rgba(0, 0, 0, 0.3);
+          backdrop-filter: blur(4px);
+        }
+        
         @keyframes shimmer {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
+        
+        @keyframes textureMove {
+          0%, 100% { background-position: 0% 0%, 100% 100%, 0% 0%; }
+          50% { background-position: 100% 100%, 0% 0%, 100% 100%; }
+        }
+        
+        @keyframes messageShine {
+          0%, 100% { opacity: 0.1; }
+          50% { opacity: 0.3; }
+        }
+        
+        @keyframes patternMove {
+          0% { transform: translateX(-4px); }
+          100% { transform: translateX(0px); }
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 640px) {
+          .mobile-chat {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+          }
+          
+          .mobile-chat-container {
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 0 !important;
+            max-width: none !important;
+          }
+          
+          .mobile-header {
+            padding: 1rem 1rem 0.75rem 1rem !important;
+          }
+          
+          .mobile-messages {
+            padding: 1rem 0.75rem !important;
+          }
+          
+          .mobile-input {
+            padding: 1rem !important;
+          }
+          
+          .mobile-close {
+            position: absolute !important;
+            top: 1rem !important;
+            right: 1rem !important;
+            z-index: 10 !important;
+          }
+        }
+        
+        /* Desktop hover effects */
+        @media (min-width: 641px) {
+          .desktop-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(121, 22, 3, 0.3);
+          }
+        }
+        
+        /* Smooth scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 215, 0, 0.1);
+          border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: linear-gradient(135deg, #791603, #8B1E0A);
+          border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(135deg, #8B1E0A, #791603);
+        }
       `}</style>
       
-      <div className="fixed bottom-6 right-6 z-50 luxury-chat">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 luxury-chat">
         {open ? (
-          <div className="relative">
-            {/* Close button above chat box - left corner */}
-            <div className="flex justify-start mb-2">
-              <button 
-                onClick={() => setOpen(false)}
-                className="close-button w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
-                title="Close Chat"
-              >
-                <ChevronDown className="w-6 h-6" />
-              </button>
-            </div>
-            
-            <div className="w-96 bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-sm border border-yellow-300/30" style={{height: '85vh'}}>
-              {/* Header with royal design */}
-              <div className="maroon-gradient text-white p-4 relative overflow-hidden">
-                <div className="absolute inset-0 gold-shimmer opacity-10"></div>
-                <div className="relative flex justify-center items-center">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <h3 className="font-bold text-lg">🛕 Rani AI</h3>
-                      <p className="text-xs opacity-90 font-light">Royal Assistant</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full gold-shimmer opacity-20"></div>
-                <div className="absolute -left-2 -bottom-2 w-12 h-12 rounded-full gold-shimmer opacity-15"></div>
-              </div>
-
-              {/* Chat Messages */}
-              <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3 text-sm bg-gradient-to-b from-amber-50 to-yellow-50">
-                {messages.length === 0 && (
-                  <div className="text-center py-8">
-                    <div className="text-6xl mb-3">👑</div>
-                    <p className="text-gray-600 font-medium">Welcome to Rani AI</p>
-                    <p className="text-xs text-gray-500 mt-1">Your royal assistant awaits your command</p>
-                  </div>
-                )}
+          <>
+            {/* Mobile overlay */}
+            <div className="sm:hidden mobile-overlay mobile-chat">
+              <div className="mobile-chat-container bg-white flex flex-col overflow-hidden">
+                {/* Mobile close button */}
+                <button 
+                  onClick={() => setOpen(false)}
+                  className="mobile-close close-button w-10 h-10 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg"
+                  title="Close Chat"
+                >
+                  <X className="w-5 h-5" />
+                </button>
                 
-                {messages.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`rounded-2xl px-4 py-3 max-w-[80%] font-medium shadow-lg ${
-                        msg.sender === 'user'
-                          ? 'message-gradient-user text-white shadow-red-900/30'
-                          : 'message-gradient-ai shadow-yellow-400/30'
-                      }`}
-                    >
-                      {msg.sender === 'ai' && (
-                        <div className="flex items-center gap-2 mb-1">
-                          <Sparkles className="w-3 h-3" />
-                          <span className="text-xs font-bold opacity-80">RANI</span>
-                        </div>
-                      )}
-                      {msg.text}
-                    </div>
-                  </div>
-                ))}
-                
-                {loading && (
-                  <div className="flex justify-start">
-                    <div className="typing-indicator px-4 py-3 rounded-2xl flex items-center font-medium shadow-lg shadow-yellow-400/30">
-                      <Loader2 className="animate-spin w-4 h-4 mr-3" />
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-3 h-3" />
-                        <span className="text-xs font-bold">Rani is crafting a response...</span>
+                {/* Header */}
+                <div className="mobile-header maroon-gradient text-white relative overflow-hidden">
+                  <div className="relative flex justify-center items-center pt-8">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <h3 className="font-bold text-xl">🛕 Rani AI</h3>
+                        <p className="text-sm opacity-90 font-light">Royal Assistant</p>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
+                  <div className="absolute -right-4 -top-4 w-20 h-20 rounded-full gold-shimmer opacity-20"></div>
+                  <div className="absolute -left-2 -bottom-2 w-16 h-16 rounded-full gold-shimmer opacity-15"></div>
+                </div>
 
-              {/* Input Area */}
-              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-t border-yellow-200">
-                <input
-                  type="text"
-                  className="input-field flex-1 rounded-2xl px-4 py-3 text-sm font-medium placeholder-gray-500 bg-gradient-to-r from-yellow-50 to-amber-50 transition-all duration-300"
-                  placeholder="Ask Rani anything..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <button
-                  className="send-button text-white rounded-2xl p-3 disabled:opacity-50 font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-                  onClick={handleSend}
-                  disabled={loading}
-                >
-                  <SendHorizonal className="w-5 h-5" />
-                </button>
+                {/* Messages */}
+                <div ref={chatRef} className="mobile-messages flex-1 overflow-y-auto space-y-4 chat-background custom-scrollbar">
+                  {messages.length === 0 && (
+                    <div className="text-center py-12">
+                      <div className="text-8xl mb-4">👑</div>
+                      <p className="text-gray-600 font-medium text-lg">Welcome to Rani AI</p>
+                      <p className="text-sm text-gray-500 mt-2">Your royal assistant awaits your command</p>
+                    </div>
+                  )}
+                  
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`rounded-2xl px-4 py-3 max-w-[85%] font-medium shadow-lg ${
+                          msg.sender === 'user'
+                            ? 'message-gradient-user text-white shadow-red-900/30'
+                            : 'message-gradient-ai shadow-yellow-400/30'
+                        }`}
+                      >
+                        {msg.sender === 'ai' && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="w-3 h-3" />
+                            <span className="text-xs font-bold opacity-80">RANI</span>
+                          </div>
+                        )}
+                        <div className="relative z-10">{msg.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {loading && (
+                    <div className="flex justify-start">
+                      <div className="typing-indicator px-4 py-3 rounded-2xl flex items-center font-medium shadow-lg shadow-yellow-400/30">
+                        <Loader2 className="animate-spin w-4 h-4 mr-3" />
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="text-xs font-bold relative z-10">Rani is crafting a response...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input */}
+                <div className="mobile-input flex items-center gap-3 bg-gradient-to-r from-amber-50 to-yellow-50 border-t border-yellow-200">
+                  <input
+                    type="text"
+                    className="input-field flex-1 rounded-2xl px-4 py-3 font-medium placeholder-gray-500 transition-all duration-300"
+                    placeholder="Ask Rani anything..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <button
+                    className="send-button text-white rounded-2xl p-3 disabled:opacity-50 font-bold hover:scale-105 transition-all duration-300 shadow-lg"
+                    onClick={handleSend}
+                    disabled={loading}
+                  >
+                    <SendHorizonal className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Desktop layout */}
+            <div className="hidden sm:block relative">
+              <div className="flex justify-start mb-2">
+                <button 
+                  onClick={() => setOpen(false)}
+                  className="close-button w-12 h-12 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
+                  title="Close Chat"
+                >
+                  <ChevronDown className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="w-96 bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden backdrop-blur-sm border border-yellow-300/30 desktop-hover transition-all duration-300" style={{height: '85vh'}}>
+                {/* Header */}
+                <div className="maroon-gradient text-white p-4 relative overflow-hidden">
+                  <div className="relative flex justify-center items-center">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <h3 className="font-bold text-lg">🛕 Rani AI</h3>
+                        <p className="text-xs opacity-90 font-light">Royal Assistant</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="absolute -right-4 -top-4 w-16 h-16 rounded-full gold-shimmer opacity-20"></div>
+                  <div className="absolute -left-2 -bottom-2 w-12 h-12 rounded-full gold-shimmer opacity-15"></div>
+                </div>
+
+                {/* Messages */}
+                <div ref={chatRef} className="flex-1 overflow-y-auto p-4 space-y-3 text-sm chat-background custom-scrollbar">
+                  {messages.length === 0 && (
+                    <div className="text-center py-8">
+                      <div className="text-6xl mb-3">👑</div>
+                      <p className="text-gray-600 font-medium">Welcome to Rani AI</p>
+                      <p className="text-xs text-gray-500 mt-1">Your royal assistant awaits your command</p>
+                    </div>
+                  )}
+                  
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`rounded-2xl px-4 py-3 max-w-[80%] font-medium shadow-lg ${
+                          msg.sender === 'user'
+                            ? 'message-gradient-user text-white shadow-red-900/30'
+                            : 'message-gradient-ai shadow-yellow-400/30'
+                        }`}
+                      >
+                        {msg.sender === 'ai' && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <Sparkles className="w-3 h-3" />
+                            <span className="text-xs font-bold opacity-80">RANI</span>
+                          </div>
+                        )}
+                        <div className="relative z-10">{msg.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {loading && (
+                    <div className="flex justify-start">
+                      <div className="typing-indicator px-4 py-3 rounded-2xl flex items-center font-medium shadow-lg shadow-yellow-400/30">
+                        <Loader2 className="animate-spin w-4 h-4 mr-3" />
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="text-xs font-bold relative z-10">Rani is crafting a response...</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Input */}
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-t border-yellow-200">
+                  <input
+                    type="text"
+                    className="input-field flex-1 rounded-2xl px-4 py-3 text-sm font-medium placeholder-gray-500 transition-all duration-300"
+                    placeholder="Ask Rani anything..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <button
+                    className="send-button text-white rounded-2xl p-3 disabled:opacity-50 font-bold hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    onClick={handleSend}
+                    disabled={loading}
+                  >
+                    <SendHorizonal className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         ) : (
           <button
             onClick={() => setOpen(true)}
-            className="floating-button text-white px-6 py-4 rounded-2xl shadow-lg flex items-center gap-3 font-bold text-lg hover:scale-105 hover:-translate-y-1 hover:shadow-2xl hover:shadow-red-900/40 transition-all duration-300"
+            className="floating-button text-white px-4 py-3 sm:px-6 sm:py-4 rounded-2xl shadow-lg flex items-center gap-2 sm:gap-3 font-bold text-base sm:text-lg hover:scale-105 hover:-translate-y-1 hover:shadow-2xl hover:shadow-red-900/40 transition-all duration-300"
           >
-            <div className="w-8 h-8 rounded-full gold-shimmer flex items-center justify-center">
-              <Crown className="w-4 h-4 text-white" />
+            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full gold-shimmer flex items-center justify-center">
+              <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
             </div>
-            <span>Rani AI</span>
-            <Sparkles className="w-5 h-5" />
+            <span className="relative z-10">Rani AI</span>
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
       </div>

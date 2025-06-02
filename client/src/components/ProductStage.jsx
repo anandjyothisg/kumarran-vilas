@@ -4,10 +4,12 @@ const ProductStage = () => {
   // Replace these with your actual product images
   const products = [
     { id: 1, name: 'Product 1', image: 'images/specialvibuthi/03.png' },
-    { id: 2, name: 'Product 2', image: 'images/handmadetrans.png' },
-    { id: 3, name: 'Product 3', image: 'images/regularvibuthi/03.png' },
+    { id: 2, name: 'Product 2', image: 'images/handmadetranscopy.png' },
+    { id: 3, name: 'Product 3', image: 'images/regularvibuthi/03trans.png' },
     { id: 4, name: 'Product 4', image: 'images/plainvibuthi/04.png' },
     { id: 5, name: 'Product 5', image: 'images/villaisandal/06.png' },
+    { id: 5, name: 'Product 5', image: 'images/ppvibuthi/03trans.png' },
+    { id: 5, name: 'Product 5', image: 'images/javvadhu/01trans.png' },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,7 +30,7 @@ const ProductStage = () => {
         
         {/* Background Stage Image Container */}
         <div 
-          className="relative w-full"
+          className="relative w-full scale-150 md:scale-100 origin-center"
           style={{
             aspectRatio: '2368/1204', // Maintains original image aspect ratio (2368:1204)
             backgroundImage: "url('/images/stagebg.png')",
@@ -38,7 +40,7 @@ const ProductStage = () => {
           }}
         >
           {/* Product Display Area */}
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 md:-translate-y-1/4">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[45%] md:-translate-y-1/4">
             <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
               
               {/* Products with sliding animations */}

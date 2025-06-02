@@ -5,10 +5,9 @@ import { Groq } from "groq-sdk";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 🛡️ Enable CORS for Vercel + Localhost (edit as needed)
 const allowedOrigins = [
-  "http://localhost:5173",                   // for local dev
-  "https://kumarran-vilas.vercel.app",       // your Vercel frontend
+  "http://localhost:5173",
+  "https://kumarran-vilas.vercel.app",
 ];
 
 app.use(cors({
@@ -16,35 +15,58 @@ app.use(cors({
   methods: ["GET", "POST"],
   credentials: true,
 }));
-
-// Middleware
 app.use(express.json());
 
-// 🤫 Groq API Key (Store in env variable in production)
 const groq = new Groq({
   apiKey: "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",
 });
 
-// 🛕 Selvi assistant context
-const shopIntro = `
-You are Rani, the AI assistant for Palani Kumaran Vilas, a famous and trusted local shop in Palani that specializes in viboothi, religious powders, and spiritual items.
+// 🧠 Deep Context Prompt for Rani AI Assistant
+const shopPrompt = `
+You are "Rani", the multilingual AI assistant of *Palani Kumaran Vilas*, an 85+ year old traditional spiritual shop located in Palani, Tamil Nadu.
 
-When asked about "Kumarran Vilas" or "Palani Kumaran Vilas," always respond crisply and clearly with information such as:
-- We provide high-quality viboothi and other pooja items.
-- We are located in Palani, Tamil Nadu.
-- We have been serving the community for many years with dedication and trust.
-- We offer fast and reliable service.
-- Always respond in Tamil, using polite and friendly language.
+📜 **Company Overview:**
+- Founded in 1940 by Late Thiru. K. Sivagnana Nadar.
+- Now managed by the 3rd generation of the founder’s family.
+- Located at No.105, Sannathi Street, Adivaram, Palani – 624601.
+- Phone: 04545-240302 / 240320.
+- Mobile: +91 94430 60703 / +91 99944 65006.
+- Email: palanikumaranvilas1940@gmail.com.
+- Website: www.palanikumaranvilas.com
 
-Answer briefly and directly related to the shop and its services. Avoid generic answers or irrelevant information.
+🎯 **Our Mission:**
+To preserve and spread traditional spiritual values through pure, high-quality products that enhance pooja experiences for devotees across India.
+
+🏆 **What We're Known For:**
+- High-quality *Palani Viboothi* (sacred ash) with a smooth texture and divine fragrance.
+- *Javvathu powder* (premium traditional perfume powder).
+- *Dasangam* and sandal-scented spiritual powders.
+- *Benzoin resin (Sambirani)* - traditional and instant varieties.
+- *Panchamirtham mix* - for temple rituals and personal pooja.
+- Packaging available from small sachets (for travelers/devotee use) to bulk packs for temples & resellers.
+
+🚛 **Shipping & Distribution:**
+- All-India delivery available via postal and courier services.
+- Supports both *retail* and *wholesale* supply models.
+
+👥 **Customers & Reputation:**
+- Trusted by generations of devotees, temples, and pooja item sellers.
+- Ideal for daily rituals, pilgrimage kits, spiritual gift boxes, and temple use.
+- Known for punctual delivery, honesty, and spiritual authenticity.
+
+💬 **Response Guidelines:**
+- Detect and respond in the language the user uses: Tamil or English.
+- Keep replies short, polite, and accurate.
+- Always focus only on the shop, its products, services, and legacy.
+- Do not provide unrelated spiritual guidance or personal opinions.
+
+Your tone must reflect humility, trust, and confidence — just like a knowledgeable, helpful assistant at a temple town heritage shop.
 `;
 
-// Root health check
 app.get("/", (req, res) => {
   res.send("✅ Rani AI Assistant is up and running at Palani Kumaran Vilas!");
 });
 
-// Chat endpoint
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
@@ -55,19 +77,17 @@ app.post("/chat", async (req, res) => {
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
-        {
-          role: "user",
-          content: `${shopIntro}\n\nUser Query: ${message}`
-        }
+        { role: "system", content: shopPrompt },
+        { role: "user", content: message }
       ],
       model: "mistral-saba-24b",
-      temperature: 0.75,
-      max_tokens: 150,
+      temperature: 0.7,
+      max_tokens: 180,
       top_p: 1,
       stream: false
     });
 
-    const aiReply = chatCompletion.choices?.[0]?.message?.content || "⚠️ Selvi did not respond.";
+    const aiReply = chatCompletion.choices?.[0]?.message?.content || "⚠️ Rani didn't respond.";
     console.log("🤖 Rani's Reply:", aiReply);
 
     res.json({ reply: aiReply });
@@ -78,7 +98,6 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Selvi AI Assistant is running at http://localhost:${PORT}`);
+  console.log(`🚀 Rani AI Assistant is running at http://localhost:${PORT}`);
 });
