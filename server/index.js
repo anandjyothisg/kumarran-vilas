@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import { Groq } from "groq-sdk";
+import dotenv from "dotenv";
+dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,8 +22,9 @@ app.use(cors({
 app.use(express.json());
 
 const groq = new Groq({
-  apiKey: "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",
+  apiKey: process.env.GROQ_API_KEY,
 });
+
 
 // 🧠 Deep Context Prompt for Rani AI Assistant
 const shopPrompt = `
