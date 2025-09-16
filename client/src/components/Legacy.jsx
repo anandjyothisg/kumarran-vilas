@@ -65,7 +65,7 @@ const Legacy = () => {
           {/* Legacy Card 1 - Founded in 1965 */}
           <div className="relative bg-gradient-to-b from-red-900 to-red-800 rounded-xl overflow-hidden shadow-xl transition-all duration-500 group hover:-translate-y-2">
             <div className="p-6 pb-4">
-              <h3 className="text-2xl font-bold text-amber-300 mb-2" style={{ fontFamily: 'Red Rose, cursive' }}>Founded in 1965</h3>
+              <h3 className="text-2xl font-bold text-amber-300 mb-2" style={{ fontFamily: 'Red Rose, cursive' }}>Founded in 1940</h3>
               <div className="border-b border-amber-300/30 w-16 mb-4"></div>
             </div>
             
@@ -114,7 +114,7 @@ const Legacy = () => {
             <div className="px-6">
               <div className="relative rounded-lg overflow-hidden border-2 border-amber-300/30">
                 <img 
-                  src="/api/placeholder/400/200" 
+                  src="\images\workers.png" 
                   alt="Traditional crafting techniques" 
                   className="w-full h-auto object-cover"
                 />
@@ -124,7 +124,7 @@ const Legacy = () => {
             <div className="relative overflow-hidden">
               <div className="p-4 pt-4 text-amber-100 text-sm">
                 <p className="mb-4" style={{ fontFamily: 'Red Rose, cursive' }}>
-                  Our products are aptly suitable for use in pooja purposes, religious purposes and other etc. At every production and quality testing stage, our personnel follow international quality norms, thereby ensuring the production of goods that are flawless in all respects and perfect in every application. We are a 100% pure and original, and have established a firm base of clients all over the world.
+                  Our products are aptly suitable for use in pooja purposes, religious purposes and other etc. At every production and quality testing stage, our personnel follow  quality norms, thereby ensuring the production of goods that are flawless in all respects and perfect in every application. We are a 100% pure and original, and have established a firm base of clients all over the world.
                 </p>
               </div>
               
@@ -155,7 +155,7 @@ const Legacy = () => {
             <div className="px-6">
               <div className="relative rounded-lg overflow-hidden border-2 border-amber-300/30">
                 <img 
-                  src="/api/placeholder/400/200" 
+                  src="\images\Crowd.png" 
                   alt="Award winning craftsmanship" 
                   className="w-full h-auto object-cover"
                 />
